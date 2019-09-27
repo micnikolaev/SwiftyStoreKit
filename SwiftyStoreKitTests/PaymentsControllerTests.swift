@@ -229,7 +229,7 @@ class PaymentsControllerTests: XCTestCase {
         XCTAssertEqual(spy.finishTransactionCalledCount, 1)
     }
 
-    func makePaymentsController(appendPayments payments: [Payment]) -> PaymentsController {
+    func makePaymentsController(appendPayments payments: [FullPayment]) -> PaymentsController {
 
         let paymentsController = PaymentsController()
 
@@ -238,12 +238,12 @@ class PaymentsControllerTests: XCTestCase {
         return paymentsController
     }
 
-    func makeTestPayment(product: SKProduct, atomically: Bool = true, callback: @escaping (TransactionResult) -> Void) -> Payment {
+    func makeTestPayment(product: SKProduct, atomically: Bool = true, callback: @escaping (TransactionResult) -> Void) -> FullPayment {
 
-        return Payment(product: product, quantity: 1, atomically: atomically, applicationUsername: "", simulatesAskToBuyInSandbox: false, callback: callback)
+        return FullPayment(product: product, quantity: 1, atomically: atomically, applicationUsername: "", simulatesAskToBuyInSandbox: false, callback: callback)
     }
 
-    func makeTestPayment(productIdentifier: String, atomically: Bool = true, callback: @escaping (TransactionResult) -> Void) -> Payment {
+    func makeTestPayment(productIdentifier: String, atomically: Bool = true, callback: @escaping (TransactionResult) -> Void) -> FullPayment {
 
         let product = TestProduct(productIdentifier: productIdentifier)
         return makeTestPayment(product: product, atomically: atomically, callback: callback)

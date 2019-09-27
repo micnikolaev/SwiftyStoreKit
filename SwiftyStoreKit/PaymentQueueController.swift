@@ -116,7 +116,7 @@ class PaymentQueueController: NSObject, SKPaymentTransactionObserver {
         assert(completeTransactionsController.completeTransactions != nil, message)
     }
 
-    func startPayment(_ payment: Payment) {
+    func startPayment(_ payment: FullPayment) {
         assertCompleteTransactionsWasCalled()
         
         let skPayment = SKMutablePayment(product: payment.product)
@@ -133,7 +133,25 @@ class PaymentQueueController: NSObject, SKPaymentTransactionObserver {
 
         paymentsController.append(payment)
     }
-
+    
+    @available(iOS 12.2, *)
+    func startDiscountPayment(_ payment: DiscountPayment) {
+        assertCompleteTransactionsWasCalled()
+        
+        let skPayment = SKMutablePayment(product: payment.product)
+        skPayment.applicationUsername = payment.applicationUsername
+        skPayment.quantity = payment.quantity
+        skPayment.paymentDiscount = payment.discount
+        
+        #if os(iOS) || os(tvOS)
+            skPayment.simulatesAskToBuyInSandbox = payment.simulatesAskToBuyInSandbox
+        #endif
+        
+        paymentQueue.add(skPayment)
+        
+        paymentsController.append(payment)
+    }
+    
     func restorePurchases(_ restorePurchases: RestorePurchases) {
         assertCompleteTransactionsWasCalled()
 

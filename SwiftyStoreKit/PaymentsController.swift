@@ -25,14 +25,47 @@
 import Foundation
 import StoreKit
 
-struct Payment: Hashable {
-    let product: SKProduct
+protocol Payment {
+    var product: SKProduct { get }
+    var quantity: Int { get }
+    var atomically: Bool { get }
+    var applicationUsername: String { get }
+    var simulatesAskToBuyInSandbox: Bool { get }
+    var callback: (TransactionResult) -> Void { get }
+}
+
+@available(iOS 12.2, *)
+struct DiscountPayment: Payment, Hashable {
+    var product: SKProduct
+    let quantity: Int
+    let atomically: Bool
+    let applicationUsername: String
+    let simulatesAskToBuyInSandbox: Bool
+    let discount: SKPaymentDiscount
+    let callback: (TransactionResult) -> Void
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(product)
+        hasher.combine(quantity)
+        hasher.combine(atomically)
+        hasher.combine(applicationUsername)
+        hasher.combine(discount)
+        hasher.combine(simulatesAskToBuyInSandbox)
+    }
+    
+    static func == (lhs: DiscountPayment, rhs: DiscountPayment) -> Bool {
+        return lhs.product.productIdentifier == rhs.product.productIdentifier
+    }
+}
+
+struct FullPayment: Payment, Hashable {
+    var product: SKProduct
     let quantity: Int
     let atomically: Bool
     let applicationUsername: String
     let simulatesAskToBuyInSandbox: Bool
     let callback: (TransactionResult) -> Void
-
+    
     func hash(into hasher: inout Hasher) {
         hasher.combine(product)
         hasher.combine(quantity)
@@ -41,7 +74,7 @@ struct Payment: Hashable {
         hasher.combine(simulatesAskToBuyInSandbox)
     }
     
-    static func == (lhs: Payment, rhs: Payment) -> Bool {
+    static func == (lhs: FullPayment, rhs: FullPayment) -> Bool {
         return lhs.product.productIdentifier == rhs.product.productIdentifier
     }
 }
@@ -51,13 +84,13 @@ class PaymentsController: TransactionController {
     private var payments: [Payment] = []
 
     private func findPaymentIndex(withProductIdentifier identifier: String) -> Int? {
-        for payment in payments where payment.product.productIdentifier == identifier {
-            return payments.firstIndex(of: payment)
+        for payment in payments {
+            return payments.firstIndex(where: { $0.product.productIdentifier == payment.product.productIdentifier })
         }
         return nil
     }
 
-    func hasPayment(_ payment: Payment) -> Bool {
+    func hasPayment(_ payment: FullPayment) -> Bool {
         return findPaymentIndex(withProductIdentifier: payment.product.productIdentifier) != nil
     }
 
