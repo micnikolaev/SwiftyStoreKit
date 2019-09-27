@@ -204,10 +204,26 @@ extension SwiftyStoreKit {
     
     /**
      *  Purchase a product with discount
+     *  - Parameter productId: productId as specified in iTunes Connect
+     *  - Parameter quantity: quantity of the product to be purchased
+     *  - Parameter atomically: whether the product is purchased atomically (e.g. finishTransaction is called immediately)
+     *  - Parameter applicationUsername: an opaque identifier for the user’s account on your system
+     *  - Parameter discount: discount to be applied to this payment.
+     *  - Parameter completion: handler for result
+     */
+    @available(iOS 12.2, *)
+    public class func purchaseProduct(_ productId: String, quantity: Int = 1, atomically: Bool = true, applicationUsername: String = "", simulatesAskToBuyInSandbox: Bool = false, discount: SKPaymentDiscount, completion: @escaping ( PurchaseResult) -> Void) {
+        
+        sharedInstance.purchaseProduct(productId, quantity: quantity, atomically: atomically, applicationUsername: applicationUsername, simulatesAskToBuyInSandbox: simulatesAskToBuyInSandbox, discount: discount, completion: completion)
+    }
+    
+    /**
+     *  Purchase a product with discount
      *  - Parameter product: product to be purchased
      *  - Parameter quantity: quantity of the product to be purchased
      *  - Parameter atomically: whether the product is purchased atomically (e.g. finishTransaction is called immediately)
      *  - Parameter applicationUsername: an opaque identifier for the user’s account on your system
+     *  - Parameter discount: discount to be applied to this payment.
      *  - Parameter completion: handler for result
      */
     @available(iOS 12.2, *)
